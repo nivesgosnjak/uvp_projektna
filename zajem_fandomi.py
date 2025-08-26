@@ -9,7 +9,7 @@ link_vrsta=r"<li id=\"medium_.*?href=\"(.*?)\">(.*?)</a>"
 def najdi_url(besedilo):
     """funkcija najde dodatek linka za dostop 
     do spletne strani posamezne vrste fandoma
-    in njegovo ime, ki je še vedno nespremenjeno, ups"""
+    in njegovo ime (ki je še vedno nespremenjeno)"""
     seznam=re.findall(link_vrsta, besedilo)
     # pod imenom "Uncategorised fandoms" so zgolj dela, ne tudi njihova pripadnost
     return seznam[:-1]
@@ -30,7 +30,7 @@ def seznam_fandomov(url):
 def fandom_to_dict(sez_url,url):
     """funkcija dobi seznam povezav do vrst fandomov,
     vrne seznam slovarjev z vrsto fandoma, naslovom fandoma in
-    število del"""
+    številom del"""
     dicts=[]
     for el in sez_url:
         link=url+el[0]

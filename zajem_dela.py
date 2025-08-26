@@ -76,9 +76,9 @@ def pretvori_datum(datum):
 def fanfic_podatki(seznam):
     """ Funkcija sprejme seznam stringov - posameznih 
     fanficov, iz njih dobi podatke kot so naslov, avtor,
-    število besed, komentrji, hits, bookmarks, kudos, poglavja,
-    zadnja posodobitev, required warnings and shite,
-    vse to vrne v obliki seznamov slovarjev, bajeeee"""
+    število besed, komentarji, hits, bookmarks, kudos, poglavja,
+    zadnja posodobitev, required warnings,
+    vse to vrne v obliki seznamov slovarjev"""
     dicts=[]
     for fanfic in seznam:
         dict={}

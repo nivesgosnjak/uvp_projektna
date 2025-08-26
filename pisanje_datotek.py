@@ -19,7 +19,7 @@ def text_to_file(text, directory, filename):
 
 def zapisi_v_csv(seznam, directory, filename):
     """ Funkcija sprejme seznam slovarjev in jih 
-    v obliki csv datoteke zapiše v dan daoteko in mapo,
+    v obliki csv datoteke zapiše v dano daoteko in mapo,
     pri tem so stolpci ključi slovarjev"""
     stolpci=list(seznam[0].keys())
     os.makedirs(directory, exist_ok=True)
