@@ -1,12 +1,15 @@
 import requests
 import os
 import csv
+up_posrednik = ('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' +
+                 ' (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36')
 
+headers={'User-Agent':up_posrednik}
 
 def url_to_string(link):
     """ Funkcija prevede vsebino spletne strani
     v besedilo """
-    return requests.get(link).text
+    return requests.get(link, headers=headers).text
 
 def text_to_file(text, directory, filename):
     """ Funkcija zapiše besedilo v datoteko """

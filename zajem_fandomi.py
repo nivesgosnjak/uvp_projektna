@@ -3,32 +3,36 @@
 import re
 from pisanje_datotek import url_to_string
 
+#########################################################
+# vzorci
 
-link_vrsta=r"<li id=\"medium_.*?href=\"(.*?)\">(.*?)</a>"
+# poišče link in vrsto
+link_vrsta=re.compile(r"<li id=\"medium_.*?href=\"(.*?)\">(.*?)</a>",re.DOTALL)
+
+# poišče ime fandoma in število del v njem
+fandom_st=re.compile(r"<a class=\"tag\" href=\".*?\">(.*?)</a>.*?\((.*?)\)",re.DOTALL)
+
+
+##########################################################
+
 
 def najdi_url(besedilo):
-    """funkcija najde dodatek linka za dostop 
+    """ Funkcija najde dodatek linka za dostop 
     do spletne strani posamezne vrste fandoma
-    in njegovo ime (ki je še vedno nespremenjeno)"""
-    seznam=re.findall(link_vrsta, besedilo)
-    # pod imenom "Uncategorised fandoms" so zgolj dela, ne tudi njihova pripadnost
+    in njegovo ime, izpusti kategorijo 'Uncategorised
+    Fandoms' """
+    seznam=link_vrsta.findall(besedilo)
     return seznam[:-1]
 
-fandom_st=r"<a class=\"tag\" href=\".*?\">(.*?)</a>.*?\((.*?)\)"
-
-
 def seznam_fandomov(url):
-    """funkcija najde vse fandome in 
+    """ Funkcija najde vse fandome in 
     število del v njih, vrne seznam tuplov"""
     besedilo=url_to_string(url)
-    seznam= re.findall(fandom_st, besedilo, flags=re.DOTALL)
-    # for el in seznam:
-    #     if int(el[1])<50:
-    #         seznam.remove(el)
+    seznam= fandom_st.findall(besedilo)
     return seznam
 
 def fandom_to_dict(sez_url,url):
-    """funkcija dobi seznam povezav do vrst fandomov,
+    """ Funkcija sprejme seznam povezav do vrst fandomov,
     vrne seznam slovarjev z vrsto fandoma, naslovom fandoma in
     številom del"""
     dicts=[]
@@ -38,9 +42,9 @@ def fandom_to_dict(sez_url,url):
         naslov_st=seznam_fandomov(link)
         for el1 in naslov_st:
             dict={}
-            dict["vrsta_fandoma"]=vrsta
+            dict["vrsta fandoma"]=vrsta
             dict["fandom"]=el1[0]
-            dict["število_del"]=int(el1[1])
+            dict["število del"]=int(el1[1])
             dicts.append(dict)
     return dicts
 

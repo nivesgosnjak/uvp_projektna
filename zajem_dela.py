@@ -1,103 +1,85 @@
 # Funkcije za pisanje druge csv datoteke
 
 import re
-from pisanje_datotek import url_to_string
+import time
+from pomozne import *
+
+#####################################################
+# glavni vzorci
+avtor=re.compile(r'<a rel="author" .*?>(.*?)</a>', re.DOTALL) 
+
+vzorci_fanfic=re.compile(
+    r'<h4 class="heading">.*?>(.*?)</a>.*?'
+    r'<p class="datetime">(.*?)</p>.*?'
+    r'<dd class="language" .*?>(.*?)</dd>.*?'
+    r'<dd class="words">(.*?)</dd>.*?'
+    r'<dd class="comments"><a href=".*?">(.*?)</a>.*?'
+    r'<dd class="kudos"><a .*?>(.*?)</a>.*?'
+    r'<dd class="bookmarks"><a .*?>(.*?)</a>.*?'
+    r'<dd class="hits">(.*?)</dd>.',
+    re.DOTALL
+)
+
+vzorci_poglavja=re.compile(
+    r'<dd class="chapters".*?'
+    r'>(\d+).*?'
+    r'/(\d+|\?)'
+)
+
+#####################################################
+# Da lahko zajamemo več kot prvih 20 del napisanih na prvi strani,
+# se moremo sprehoditi čez strani, pri tem je a število strani,
+# čez katere se bomo sprehodili.
+a=50
+osnovni_link="https://archiveofourown.org/works?commit=Sort+and+Filter&work_search%5Bsort_column%5D=kudos_count&work_search%5Bother_tag_names%5D=&work_search%5Bexcluded_tag_names%5D=&work_search%5Bcrossover%5D=&work_search%5Bcomplete%5D=&work_search%5Bwords_from%5D=&work_search%5Bwords_to%5D=&work_search%5Bdate_from%5D=&work_search%5Bdate_to%5D=&work_search%5Bquery%5D=&work_search%5Blanguage_id%5D=&tag_id=Harry+Potter+-+J*d*+K*d*+Rowling"
 
 
-vzorec_deli=r'<!--title, author, fandom-->(.*?)</dl>'
-
-def na_dele(url):
-    """Funkcija dobi povezavo do spletne strani,
-    vrne seznam besedil ločenih glede na posamezne fanfice"""
-    besedilo=url_to_string(url)
-    seznam_fanficov=re.findall(vzorec_deli, besedilo, flags=re.DOTALL)
-    return seznam_fanficov
+#####################################################
 
 
-# main vzorci
-naslov=r'<h4 class="heading">.*?>(.*?)</a>'
-avtor=r'<a rel="author" .*?>(.*?)</a>'
-
-jezik=r'<dd class="language" .*?>(.*?)</dd>'
-besede=r'<dd class="words">(.*?)</dd>'
-chapters1=r'<dd class="chapters"><.*?>(.*?)</a>/(.*?)</dd>' #dela za večino
-chapters2=r'<dd class="chapters">(.*?)/(.*?)</dd>' # zgolj če chapters1 ne dela
-
-kolekcije=r'<dd class="collections"><a .*?>(.*?)</a>'
-komentarji=r'<dd class="comments"><a href=".*?">(.*?)</a>'
-kudos=r'<dd class="kudos"><a .*?>(.*?)</a>'
-bookmarks=r'<dd class="bookmarks"><a .*?>(.*?)</a>'
-hits=r'<dd class="hits">(.*?)</dd>'
-
-datum=r'<p class="datetime">(.*?)</p>'
-
-vzorci=[naslov,avtor,jezik,besede,kolekcije,komentarji,kudos,bookmarks, hits, datum]
-imena_vzorci=['naslov', 'avtor', 'jezik','število besed','kolekcije', 'komentarji', 'kudos', 'bookmarks', 'hits', 'datum']
-# required tags se še morjo zgodit lolll
-
-def pretvori_datum(datum):
-    """Funkcija sprejme string, ki predstavlja
-    datum v obliki npr 13 Apr 2045 in vrne 
-    tuple (13,4,2045), kjer so vrednosti števila"""
-    deli=datum.split()
-    i=None
-    match deli[1]:
-        case "Jan":
-            i=1
-        case "Feb":
-            i=2
-        case "Mar":
-            i=3
-        case "Apr":
-            i=4
-        case "May":
-            i=5
-        case "Jun":
-            i=6
-        case "Jul":
-            i=7
-        case "Aug":
-            i=8
-        case "Sep":
-            i=9
-        case "Okt":
-            i=10
-        case "Nov":
-            i=11
-        case "Dec":
-            i=12
-    return (int(deli[0]),i,int(deli[2]))
-
-
-
-
+def vse_strani(url):
+    """ Funkcija sprejme osnovni link spletne
+    strani, ga dopolni, da se vrti skozi vse strani 
+    na spletni strani, vrne množico posameznih del"""
+    fanfici=set()
+    i=1
+    while i<=a:
+        time.sleep(0.1) # varovalo, da nas stran ne začne zavračati
+        link=url+"&page="+str(i)
+        fanfici.update(set(na_dele(link)))
+        i+=1
+    return fanfici
 
 
 def fanfic_podatki(seznam):
-    """ Funkcija sprejme seznam stringov - posameznih 
+    """ Funkcija sprejme množico stringov - posameznih 
     fanficov, iz njih dobi podatke kot so naslov, avtor,
     število besed, komentarji, hits, bookmarks, kudos, poglavja,
-    zadnja posodobitev, required warnings,
-    vse to vrne v obliki seznamov slovarjev"""
+    zadnja posodobitev, vse to vrne v obliki seznamov slovarjev"""
     dicts=[]
     for fanfic in seznam:
         dict={}
-        # za vse razen poglavij
-        for i, vzorec in enumerate(vzorci): 
-            a=re.findall(vzorec, fanfic, flags=re.DOTALL)
-            if len(a)>0:
-                dict[imena_vzorci[i]]=a[0]
-            else:
-                dict[imena_vzorci[i]]="ni podatka"
-        #popravimo datum
-        stevilsko=pretvori_datum(dict['datum'])
-        dict['datum']=stevilsko
-        # poglavja
-        poglavja=re.findall(chapters1, fanfic, flags=re.DOTALL)
-        if len(poglavja)>0:
-            dict["poglavja"]=poglavja[0]
+        najdba=vzorci_fanfic.search(fanfic)
+        datum=pretvori_datum(najdba.group(2))
+        dict['naslov']=najdba.group(1)
+        dict['mesec']=datum[0]
+        dict['leto']=datum[1] 
+        dict['jezik']=najdba.group(3) 
+        dict['število besed']=odstrani_vejico(najdba.group(4)) 
+        dict['komentarji']=odstrani_vejico(najdba.group(5)) 
+        dict['kudos']=odstrani_vejico(najdba.group(6)) 
+        dict['bookmarks']=odstrani_vejico(najdba.group(7)) 
+        dict['hits']=odstrani_vejico(najdba.group(8)) 
+        poglavja=vzorci_poglavja.search(fanfic)
+        dict['napisana poglavja']=poglavja.group(1)
+        dict['vsa poglavja']=poglavja.group(2) if poglavja.group(2)!='?' else "ni podatka"
+        avt=avtor.search(fanfic)
+        if avt:
+            dict['avtor']=avt.group(1)
         else:
-            poglavja=re.findall(chapters2, fanfic, flags=re.DOTALL)
-            dict["poglavja"]=poglavja[0]
+            dict['avtor']='ni podatka'
         dicts.append(dict)
     return dicts
+
+
+    
