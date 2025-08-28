@@ -4,7 +4,7 @@ V sledeči projektni nalogi, napisani v okviru predmeta Uvod v porgramiranje, je
 
 Za prvi del naloge so v datoteki `zajem_fandomi.py` zapisane funkcije, s pomočjo katerih dostopamo do posameznih kategorij na pletni strani in pri vsaki izlušči imena posameznih področij (angleško fandomov) in pripadajoče število del.
 
-Za drugi del naloge so v datoteki `zajem_dela.py` funkcije, s pomočjo katerih iz posameznega objavljenega dela izlščimo osnovne podatke kot so naslov, avtor, število besed .... Da zajamemo več kot le 20 del, objavljenih na osnovni strani, se moramo premikati po različnih straneh. To naredimo s pomočjo funkcij definiranih v `pomozne.py`. Tam so prav tako definirane funkcije, ki nam podatke, zajete v tem delu naloge, pomagajo lepše predstaviti v slovarjih.
+Za drugi del naloge so v datoteki `zajem_dela.py` funkcije, s pomočjo katerih iz posameznega objavljenega dela izlščimo osnovne podatke kot so naslov, avtor, število besed .... Da zajamemo več kot le 20 del, objavljenih na osnovni strani, se moramo premikati po različnih straneh. To naredimo s pomočjo funkcij definiranih v `pomozne.py`. Tam so prav tako definirane funkcije, ki nam podatke zajete v tem delu naloge, pomagajo lepše predstaviti v slovarjih.
 
 Za dostop do spletne strani in zapis podatkov v datoteke so funkcije definirane v `pisanje_datotek.py`.
 
